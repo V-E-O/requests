@@ -301,7 +301,8 @@ class Session(SessionRedirectMixin):
         hooks=None,
         stream=None,
         verify=None,
-        cert=None):
+        cert=None,
+        trust_env=None):
         """Constructs a :class:`Request <Request>`, prepares it and sends it.
         Returns :class:`Response <Response>` object.
 
@@ -330,6 +331,8 @@ class Session(SessionRedirectMixin):
             A CA_BUNDLE path can also be provided.
         :param cert: (optional) if String, path to ssl client cert file (.pem).
             If Tuple, ('cert', 'key') pair.
+        :param trust_env: (optional) whether to read proxies from environment
+            variables if no explicit proxies set. Defaults to ``True``.
         """
 
         method = builtin_str(method)
@@ -351,7 +354,7 @@ class Session(SessionRedirectMixin):
         proxies = proxies or {}
 
         # Gather clues from the surrounding environment.
-        if self.trust_env:
+        if merge_setting(trust_env, self.trust_env):
             # Set environment's proxies.
             env_proxies = get_environ_proxies(url) or {}
             for (k, v) in env_proxies.items():
